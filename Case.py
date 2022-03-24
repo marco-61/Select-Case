@@ -21,32 +21,36 @@ class Case:
         self.__else_case=None
         self.__else_arg=()
         self.__label=None
-    def select_case(self,label=None):
+        
+    def Select(self,label=None):
         """inilizza il costrutto"""
         self.__label=label
-    def case(self, label, TO=None, IS="==", command=None, arg=()):
-        """predispone condizione e azione"""
-        if self.__label is not None: # se è presente la label
-            if TO : # clausola TO presente
-                cond=self.__label >=label and self.__label  <= TO
-                self.__case.append((cond, command, arg))
-            else:
-                d=self.__op(IS, label)
-                cond=d[IS]
-                self.__case.append((cond, command, arg))
-        else: # case(condizione,command,arg)
-            self.__case.append((label, command, arg))
-        #print("#"*10,self.__case,"#" *10)   
-    def __op(self,IS,label):
+
+    def __op(self,Is,label):
         d={"==":self.__label==label,"<=":self.__label<=label,\
            ">=":self.__label>=label,"!=":self.__label!=label}
-        return d
-    def case_else(self, command, arg=()):
+        return d[Is]
+    def Range(self,start,stop, command=None, arg=()):
+        if self.__label is not None: # se è presente la label
+            cond=self.__label >=start and self.__label  <= stop
+            self.__case.append((cond, command, arg))
+        else: raise('label not present in Select')
+    def In(self,tupla, command=None, arg=()):
+        cond=self.__label in tupla
+        self.__case.append((cond, command, arg))
+    def Is(self,label,cmp='==', command=None, arg=()):
+        if self.__label is not None: # se è presente la label
+            cond=self.__op(cmp, label)
+            self.__case.append((cond, command, arg))
+        else: raise('label not present in Select')
+    def Cmp(self,cond, command=None, arg=()):
+        self.__case.append((cond, command, arg))
+    def Else(self, command, arg=()):
         """viene eseguito se nessun caso è verificato"""
         self.__else_case=command
         self.__else_arg=arg
     @property    
-    def end_select(self):
+    def End(self):
         """Chiude la struttura ed esegue l'azione"""
         eseguito=False
         for i in range(len(self.__case)):
